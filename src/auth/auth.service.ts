@@ -67,6 +67,7 @@ export class AuthService {
     return result;
   }
 
+  // generate empId like EMP00001
   private generateEmpId = async () => {
     const lastUser = await this.prisma.user.findFirst({
       orderBy: { id: 'desc' },
