@@ -25,28 +25,4 @@ export class AuthController {
     }
     return this.authService.login(user);
   }
-
-  @Post('register')
-  @UseGuards(JwtGuard, RolesGuard)
-  @Roles('ADMIN')
-  async register(
-    @Body()
-    registerDto: {
-      firstName: string;
-      lastName: string;
-      username: string;
-      password: string;
-      role?: 'ADMIN' | 'EMPLOYEE';
-      department?: string;
-    },
-  ) {
-    return this.authService.register({
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      userName: registerDto.username,
-      password: registerDto.password,
-      role: registerDto.role,
-      department: registerDto.department,
-    });
-  }
 }
