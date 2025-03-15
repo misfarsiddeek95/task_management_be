@@ -1,9 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UserService {
@@ -14,7 +19,7 @@ export class UserService {
 
     const empId = await this.generateEmpId();
 
-    const isUsernameExist = await this.prisma.user.count({
+    const isUsernameExist = await this.prisma.user.findUnique({
       where: {
         userName: userDto.username,
       },
@@ -52,4 +57,50 @@ export class UserService {
     }
     return `EMP${String(nextNum).padStart(5, '0')}`;
   };
+
+  async updateUser(updateDto: UpdateUserDto) {
+    try {
+      const checkUserExists = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          id: updateDto.id,
+        },
+      });
+
+      if (checkUserExists) {
+        const existingUser = await this.prisma.user.findUnique({
+          where: { userName: updateDto.username },
+        });
+
+        if (existingUser && existingUser.id !== checkUserExists.id) {
+          throw new ConflictException(
+            'Username already exists. Please try another.',
+          );
+        }
+
+        const hashedPassword = await bcrypt.hash(updateDto.password, 10);
+
+        const updatedUser = await this.prisma.user.update({
+          where: { id: updateDto.id },
+          data: {
+            firstName: updateDto.firstName,
+            lastName: updateDto.lastName,
+            password: hashedPassword,
+            role: updateDto.role || Role.EMPLOYEE,
+            department: updateDto.department,
+            userName: updateDto.username,
+          },
+        });
+        const { password, ...result } = updatedUser;
+        return result;
+      }
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
+      throw error; // Re-throw other errors
+    }
+  }
 }
