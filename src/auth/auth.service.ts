@@ -26,6 +26,23 @@ export class AuthService {
     const payload = { username: user.userName, sub: user.id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
+      role: user.role,
+      name: `${user.firstName} ${user.lastName}`,
     };
+  }
+
+  async invalidateToken(token: string): Promise<void> {
+    // Store the invalidated token in the database
+    await this.prisma.token.create({
+      data: { token },
+    });
+  }
+
+  async isTokenInvalid(token: string): Promise<boolean> {
+    // Check if the token is in the invalidated tokens list
+    const invalidToken = await this.prisma.token.findUnique({
+      where: { token },
+    });
+    return !!invalidToken;
   }
 }
