@@ -103,4 +103,26 @@ export class UserService {
       throw error; // Re-throw other errors
     }
   }
+
+  async deleteUser(id: string) {
+    try {
+      const checkUserExists = await this.prisma.user.findUniqueOrThrow({
+        where: {
+          id: +id,
+        },
+      });
+
+      if (checkUserExists) {
+        return await this.prisma.user.delete({ where: { id: +id } });
+      }
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('User not found');
+      }
+      throw error; // Re-throw other errors
+    }
+  }
 }

@@ -39,12 +39,13 @@ model User {
   tasks Task[]
 
   @@index([userName])
+  @@map("user")
 }
 
 model Task {
   id              Int      @id @default(autoincrement())
   userId          Int
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   taskName        String   @map("task_name")
   taskDescription String   @map("task_description")
   taskPriority    Priority @map("task_priority")
@@ -53,4 +54,5 @@ model Task {
 
   @@index([userId])
   @@index([taskPriority])
+  @@map("task")
 }
