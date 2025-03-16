@@ -29,7 +29,7 @@ model User {
   empId      String?  @unique @map("emp_id")
   firstName  String   @map("first_name")
   lastName   String   @map("last_name")
-  userName   String   @map("username") @unique
+  userName   String   @unique @map("username")
   password   String
   department String?
   role       Role     @default(EMPLOYEE) // "admin" or "employee"
@@ -47,7 +47,7 @@ model Task {
   userId          Int
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   taskName        String   @map("task_name")
-  taskDescription String   @map("task_description")
+  taskDescription String?  @map("task_description") @db.Text
   taskPriority    Priority @map("task_priority")
   dueDate         DateTime @map("due_date")
   isCompleted     Boolean  @default(false) @map("is_completed")
