@@ -14,6 +14,10 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async getAllUsers() {
+    return await this.prisma.user.findMany();
+  }
+
   async register(userDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(userDto.password, 10);
 
@@ -77,14 +81,13 @@ export class UserService {
           );
         }
 
-        const hashedPassword = await bcrypt.hash(updateDto.password, 10);
+        // const hashedPassword = await bcrypt.hash(updateDto.password, 10);
 
         const updatedUser = await this.prisma.user.update({
           where: { id: updateDto.id },
           data: {
             firstName: updateDto.firstName,
             lastName: updateDto.lastName,
-            password: hashedPassword,
             role: updateDto.role || Role.EMPLOYEE,
             department: updateDto.department,
             userName: updateDto.username,

@@ -6,6 +6,7 @@ import {
   Patch,
   Delete,
   Param,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtGuard } from 'src/common/guards/jwt.guard';
@@ -20,6 +21,11 @@ import { Role } from '@prisma/client';
 @Roles(Role.ADMIN)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get()
+  async getAllUser() {
+    return this.userService.getAllUsers();
+  }
 
   @Post('register')
   async register(
