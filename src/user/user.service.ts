@@ -15,7 +15,9 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async getAllUsers() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      where: { role: 'EMPLOYEE' },
+    });
   }
 
   async register(userDto: CreateUserDto) {
