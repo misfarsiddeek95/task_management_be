@@ -42,4 +42,24 @@ export class TaskService {
       },
     });
   }
+
+  async loadTasks(user) {
+    const response = await this.prisma.task.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    const returnArr = response?.map((item) => ({
+      ...item,
+      priority_color:
+        item?.taskPriority === 'HIGH'
+          ? 'danger'
+          : item?.taskPriority === 'LOW'
+            ? 'primary'
+            : 'warning',
+    }));
+
+    return returnArr;
+  }
 }
