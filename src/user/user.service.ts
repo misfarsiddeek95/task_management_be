@@ -15,9 +15,42 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async getAllUsers() {
-    return await this.prisma.user.findMany({
-      where: { role: 'EMPLOYEE' },
-    });
+    return await this.prisma.user
+      .findMany({
+        where: { role: 'EMPLOYEE' },
+        select: {
+          id: true,
+          empId: true,
+          firstName: true,
+          lastName: true,
+          userName: true,
+          department: true,
+          role: true,
+          tasks: {
+            select: {
+              isCompleted: true,
+            },
+          },
+        },
+      })
+      .then((users) =>
+        users.map((user) => {
+          const completedTasks = user?.tasks?.filter(
+            (task) => task.isCompleted,
+          ).length;
+          const totalTasks = user?.tasks?.length;
+          const completedPercentage =
+            totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+          return {
+            ...user,
+            completedTasks,
+            notCompletedTasks: totalTasks - completedTasks,
+            completedPercentage,
+            totalTasks,
+          };
+        }),
+      );
   }
 
   async register(userDto: CreateUserDto) {
@@ -35,17 +68,49 @@ export class UserService {
       throw new ConflictException('Username already exists');
     }
 
-    const createUser = await this.prisma.user.create({
-      data: {
-        empId,
-        firstName: userDto.firstName,
-        lastName: userDto.lastName,
-        password: hashedPassword,
-        role: userDto.role || Role.EMPLOYEE,
-        department: userDto.department,
-        userName: userDto.username,
-      },
-    });
+    const createUser = await this.prisma.user
+      .create({
+        data: {
+          empId,
+          firstName: userDto.firstName,
+          lastName: userDto.lastName,
+          password: hashedPassword,
+          role: userDto.role || Role.EMPLOYEE,
+          department: userDto.department,
+          userName: userDto.username,
+        },
+        select: {
+          id: true,
+          empId: true,
+          firstName: true,
+          lastName: true,
+          userName: true,
+          department: true,
+          password: true,
+          role: true,
+          tasks: {
+            select: {
+              isCompleted: true,
+            },
+          },
+        },
+      })
+      .then((user) => {
+        const completedTasks = user?.tasks?.filter(
+          (task) => task.isCompleted,
+        ).length;
+        const totalTasks = user?.tasks?.length;
+        const completedPercentage =
+          totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        return {
+          ...user,
+          completedTasks,
+          notCompletedTasks: totalTasks - completedTasks,
+          completedPercentage,
+          totalTasks,
+        };
+      });
 
     const { password, ...result } = createUser;
     return result;
