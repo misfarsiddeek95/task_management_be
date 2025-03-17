@@ -49,6 +49,9 @@ export class TaskService {
         where: {
           userId: user.id,
         },
+        orderBy: {
+          isCompleted: 'asc',
+        },
       })
       .then((tasks) =>
         tasks.map((task) => ({
