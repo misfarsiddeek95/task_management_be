@@ -31,6 +31,13 @@
 $ yarn install
 ```
 
+## Database setup
+
+```bash
+$ npx prisma migrate dev --name init
+$ npx prisma db seed
+```
+
 ## Compile and run the project
 
 ```bash
