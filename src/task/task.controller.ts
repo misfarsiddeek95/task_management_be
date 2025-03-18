@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { NotificationDto, UpdateTaskDto } from './dto/update-task.dto';
 import { JwtGuard } from 'src/common/guards/jwt.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -37,5 +37,17 @@ export class TaskController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   loadTasks(@Req() request: Request) {
     return this.taskService.loadTasks(request.user);
+  }
+
+  @Get('get-notifications')
+  @Roles(Role.ADMIN, Role.EMPLOYEE)
+  getUserNotifications(@Req() request: Request) {
+    return this.taskService.getUserNotifications(request.user);
+  }
+
+  @Patch('mark-read-notification')
+  @Roles(Role.ADMIN, Role.EMPLOYEE)
+  markNotificationAsRead(@Body() data: NotificationDto) {
+    return this.taskService.markNotificationAsRead(data);
   }
 }

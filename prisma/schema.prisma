@@ -36,21 +36,23 @@ model User {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  tasks Task[]
+  tasks        Task[]
+  Notification Notification[]
 
   @@index([userName])
   @@map("user")
 }
 
 model Task {
-  id              Int      @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   userId          Int
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  taskName        String   @map("task_name")
-  taskDescription String?  @map("task_description") @db.Text
-  taskPriority    Priority @map("task_priority")
-  dueDate         DateTime @map("due_date")
-  isCompleted     Boolean  @default(false) @map("is_completed")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskName        String         @map("task_name")
+  taskDescription String?        @map("task_description") @db.Text
+  taskPriority    Priority       @map("task_priority")
+  dueDate         DateTime       @map("due_date")
+  isCompleted     Boolean        @default(false) @map("is_completed")
+  Notification    Notification[]
 
   @@index([userId])
   @@index([taskPriority])
@@ -63,4 +65,18 @@ model Token {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("token")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId    Int?     @map("task_id")
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  message   String   @map("message")
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("notification")
 }

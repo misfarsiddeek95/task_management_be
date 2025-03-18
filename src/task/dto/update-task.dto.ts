@@ -11,3 +11,9 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsNotEmpty()
   isCompleted?: boolean;
 }
+
+export class NotificationDto {
+  @IsNumber()
+  @IsNotEmpty()
+  notificationId: number;
+}

@@ -76,7 +76,26 @@ async function main() {
     ],
   });
 
-  console.log('upsert', upsert, upsert2, tasks);
+  const allTasks = await prisma.task.findMany({
+    where: { isCompleted: false },
+  });
+
+  let notifs: any = [];
+
+  for (const tsk of allTasks) {
+    const d = {
+      userId: tsk.userId,
+      taskId: tsk.id,
+      message: `New task assigned: ${tsk.taskName}`,
+    };
+    notifs.push(d);
+  }
+
+  const notifications = await prisma.notification.createMany({
+    data: notifs,
+  });
+
+  console.log('upsert', upsert, upsert2, tasks, notifications);
 }
 
 main()
