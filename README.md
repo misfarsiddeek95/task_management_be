@@ -28,6 +28,7 @@
 ## Project setup
 
 ```bash
+$ git clone https://github.com/misfarsiddeek95/task_management_fe.git
 $ yarn install
 ```
 
