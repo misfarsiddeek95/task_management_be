@@ -46,7 +46,37 @@ async function main() {
     },
   });
 
-  console.log('upsert', upsert, upsert2);
+  const tasks = await prisma.task.createMany({
+    data: [
+      {
+        taskName: 'UI Bug fixes in login page',
+        taskDescription: 'Alignment issues',
+        taskPriority: 'LOW',
+        dueDate: '2025-04-04T00:00:00.000Z',
+        isCompleted: false,
+        userId: upsert2.id,
+      },
+      {
+        taskName: 'Authentication issue fix in BE',
+        taskDescription: 'Login token issue',
+        taskPriority: 'HIGH',
+        dueDate: '2025-04-04T00:00:00.000Z',
+        isCompleted: false,
+        userId: upsert2.id,
+      },
+      {
+        taskName: 'Redirect issue after login',
+        taskDescription:
+          'After successful login user should be redirected to the dashboard',
+        taskPriority: 'MEDIUM',
+        dueDate: '2025-04-04T00:00:00.000Z',
+        isCompleted: false,
+        userId: upsert2.id,
+      },
+    ],
+  });
+
+  console.log('upsert', upsert, upsert2, tasks);
 }
 
 main()
